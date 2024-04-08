@@ -1,0 +1,94 @@
+
+<div class="container">
+  <div class="row">
+    <div class="col-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">登入</h5>
+          <form name="form1" onsubmit="sendData(event)">
+            <div class="mb-3">
+              <label for="account" class="form-label">Email address</label>
+              <input
+                type="text"
+                class="form-control"
+                id="account"
+                name="account"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary">登入</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
+<script>
+  async function sendData(e) {
+    e.preventDefault(); // 不要以傳統的方式送出表單
+
+    const fd = new FormData(document.form1);
+
+    /*
+    // 第 1 種, 送 multipart/form-data
+    // 後端需要 upload.none() 處理
+    const r = await fetch("/login", {
+      method: "POST",
+      body: fd
+    });
+    const data = await r.json();
+    */
+
+    /*
+    // 第 2 種, application/json
+    const dataObj = {};
+    for (let [k, v] of fd.entries()) {
+      // console.log({ k, v });
+      dataObj[k] = v;
+    }
+    const r = await fetch("/login", {
+      method: "POST",
+      body: JSON.stringify(dataObj),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await r.json();
+    */
+
+    // 第 3 種, application/x-www-form-urlencoded
+    const usp = new URLSearchParams(fd);
+    const r = await fetch("/login", {
+      method: "POST",
+      body: usp.toString(),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    const data = await r.json();
+    console.log({ data });
+    if(data.success){
+      // 抓到前端的url query
+      const usp=new URLSearchParams(location.search);
+      if(usp.get("u")){
+        location.href=usp.get("u")//前端跳轉  
+      }else{
+        location.href="/"
+      }
+    
+    }else{
+      alert(data.error || "帳號密碼輸入錯誤222")
+    }
+
+  }
+</script>
+ 

@@ -1,0 +1,92 @@
+<%- include("../parts/html-head") %> <%- include("../parts/navbar") %>
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-6">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <%= totalPages %>
+          <% for(let i=page-5; i<=page+5; i++) if(i>=1 && i<=totalPages) { const
+            newQuery = {...query, page: i}; %>
+          <li class="page-item <%= i===page ? 'active' : '' %>">
+            <a class="page-link" href="?<%= new URLSearchParams(newQuery) %>"
+              ><%= i %></a
+            >
+          </li>
+          <% } %>
+        </ul>
+      </nav>
+    </div>
+    <div class="col-6">
+      <form class="d-flex" role="search">
+        <input
+          class="form-control me-2"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+          name="keyword"
+          value="<%= query.keyword ? query.keyword : '' %>"
+        />
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th><i class="fa-solid fa-trash"></i></th>
+      
+          <th>編號     </th>
+            <th>姓名</th>
+            <th>EMAIL</th>
+            <th>手機</th>
+            <th>生日</th>
+            <th>地址</th>
+            <th><i class="fa-solid fa-file-pen"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for(let r of rows) { %>
+          <tr>
+            <td>
+              <a href="javascript: removeItem(<%= r.sid %>)">
+                <i class="fa-solid fa-trash"></i>
+              </a>
+            </td>
+            <td><%= r.sid %></td>
+            <td><%= r.name %></td>
+            <td><%= r.email %></td>
+            <td><%= r.mobile %></td>
+            <td><%= r.birthday %></td>
+            <td><%= r.address %></td>
+            <td>
+              <a href="/address-book/edit/<%= r.sid %>">
+                <i class="fa-solid fa-file-pen"></i>
+              </a>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<%- include("../parts/scripts") %>
+<script>
+  const removeItem = (sid) => {
+    if (confirm(`是否要刪除編號為 ${sid} 的資料?`)) {
+      fetch(`/address-book/${sid}`, {
+        method: "DELETE",
+      })
+        .then((r) => r.json())
+        .then((result) => {
+          location.reload();
+        });
+    }
+  };
+</script>
+
+<%- include("../parts/html-foot") %>
