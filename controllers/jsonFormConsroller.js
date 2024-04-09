@@ -26,15 +26,19 @@ module.exports = {
     },
     async ImgFormTa(req,res){  
         // 上傳圖片資料
+        // console.log(req.file)
 
         if (!req.file) {
-            return res.status(400).json({message:'No file uploaded.'});
+            return  res.status(400).json({message:'No file uploaded. '});
         }
         res.json({status:'Success',data:{
-            filename: req.file.originalname,
+            
+            originalname: req.file.originalname,
+            filename: req.file.filename, // 获取改名后的文件名
             mimetype: req.file.mimetype,
             size: req.file.size
           }});
+
     },
     async insertMemberForm(req,res){ 
         // 新增顧客資料
@@ -91,6 +95,24 @@ module.exports = {
         });
     },
     async deleteMemberForm(req,res){
+
+    },
+    async selectCustom(req,res){ 
+            const sql="select * from custom where custom_id=1"
+           
+            await db.query(sql)
+            .then((res2) => {    
+                if (!res2) {
+                    return res.json({ success:false, error: "Error in signup query" });
+                } else { 
+                    return res.send({ success: true,data:res2[0]});
+                } 
+            })
+            .catch((err) => {
+                console.error("Error executing SQL query:", err);
+                return res.status(500).json({ error: "An error occurred while processing the request" });
+            });
+       
 
     }
 } 

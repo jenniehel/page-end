@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script src="https://js.braintreegateway.com/web/dropin/1.42.0/js/dropin.js"></script>
+    <div id="dropin-container"></div>
+    <button id="submit-button" class="button button--small button--green">Purchase</button>
+    <script>
+        var button = document.querySelector('#submit-button');
+        async function fetchData(url) {
+            try {
+                const response = await fetch(url); // 使用await等待fetch請求完成
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json(); // 使用await等待解析JSON數據
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                throw error; // 把錯誤再次拋出，以便調用者能夠處理
+            }
+        }
+
+       async function fetchData2(url,data) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST', // 指定為 POST 請求
+                    headers: {
+                        'Content-Type': 'application/json' // 設置請求標頭，這裡假設發送 JSON 數據
+                    },
+                    body: JSON.stringify(data) // 將數據轉換為 JSON 字符串並作為請求主體發送
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const responseData = await response.json(); // 解析服務器的回應數據
+                return responseData;
+            } catch (error) {
+                console.error('Error posting data:', error);
+                throw error; // 再次拋出錯誤以便外部處理
+            }
+
+        }
+        async function fetchDataExample() {
+            let url = 'http://127.0.0.1:3006/backRoute/paypalPayMoney/client_token';
+            try {
+                const data = await fetchData(url); // 使用await等待數據請求完成
+                console.log('Fetched data:', data.data);
+                braintree.dropin.create({
+                    // authorization: 'sandbox_g42y39zw_348pk9cgf3bgyw2b',
+                    authorization: data.data,
+                    selector: '#dropin-container'
+                }, function (err, instance) {
+                    button.addEventListener('click', function () {
+                        instance.requestPaymentMethod(async function (err, payload) {
+                            if (err) {
+                                console.log("ERR :" + err)
+                            }
+                            console.log(payload) 
+                            let url = 'http://127.0.0.1:3006/backRoute/paypalPayMoney';
+                           await fetchData2(url,payload)
+
+                            // Submit payload.nonce to your server
+                        });
+                    })
+                });
+                // 在這裡進行後續操作，例如更新UI等
+            } catch (error) {
+                // 處理錯誤
+                console.error('Error fetching data:', error);
+                // 可以向用戶顯示錯誤消息或者進行其他處理
+            }
+        }
+
+        // 呼叫範例函數
+        fetchDataExample();
+
+
+    </script>
+</body>
+
+</html>

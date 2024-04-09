@@ -119,6 +119,10 @@ app.get("/m", async(req,res)=>{
 /* ************** 其他的路, 放在這行之前 *********** */
 // 靜態內容的資料夾 
 // 後端圖片資料夾
+app.get("/",(req,res)=>{
+  return res.render("paypal") 
+
+})
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 let index = require('./routes')
 app.use('/backRoute', index) 
