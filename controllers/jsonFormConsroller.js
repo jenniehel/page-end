@@ -26,18 +26,20 @@ module.exports = {
     },
     async ImgFormTa(req,res){  
         // 上傳圖片資料
-        // console.log(req.file)
+        console.log(req.file)
 
         if (!req.file) {
-            return  res.status(400).json({message:'No file uploaded. '});
+            return  res.json({status:'false',data:"沒有資料"});
+
         }
-        res.json({status:'Success',data:{
+        // res.json({status:'Success',data:{
             
-            originalname: req.file.originalname,
-            filename: req.file.filename, // 获取改名后的文件名
-            mimetype: req.file.mimetype,
-            size: req.file.size
-          }});
+        //     originalname: req.file.originalname,
+        //     filename: req.file.filename, // 获取改名后的文件名
+        //     mimetype: req.file.mimetype,
+        //     size: req.file.size
+        //   }});
+        res.json({status:"success",file:req.file})
 
     },
     async insertMemberForm(req,res){ 
