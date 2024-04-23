@@ -8,12 +8,21 @@ const path = require('path');
 const MysqlStore = mysqlSession(session);
 const sessionStore = new MysqlStore({}, db);
 const jsonTable =require("./routes")
+const secretKey = 'abcd123123';
 const app = express(); 
 app.set('view engine', 'ejs');
 app.use(express.json());
- 
+// false querystring (string/array) true qs允許url編碼json(任何型態) 
 app.use(express.urlencoded({extended:true}));
- 
+
+
+//cors 同源政策
+// https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
+// origin：配置Access-Control-Allow-Origin :(1.boolean:是否停用)(2.設定特定origin)(3.RegExp)(4.aray+regexp)(5.function)
+// methods：Access-Control-Allow-Methods:['GET', 'PUT', 'POST']
+// allowedHeaders  標頭：配置Access-Control-Allow-Headers ex ['Content-Type', 'Authorization']
+// credentials：配置Access-Control-Allow-Credentials CORS 標頭。設定為true傳遞標頭，否則省略。
+// maxAge：配置Access-Control-Max-Age CORS 標頭。設定為整數以傳遞標頭，否則省略 。可以被伺服器儲存多久
 const corsOptions={
   Credential:true,
   origin:(origin,callback)=>{
@@ -21,7 +30,21 @@ const corsOptions={
   }
 }
 app.use(cors(corsOptions));
- 
+
+// https://johnnychang25678.medium.com/node-js-cookie-session%E9%A9%97%E8%AD%89%E5%8E%9F%E7%90%86%E4%BB%A5%E5%8F%8Aexpress-session%E5%A5%97%E4%BB%B6%E4%BD%BF%E7%94%A8-aeafa386837e
+// session
+// 預設 cookie \{ path: '/', httpOnly: true, secure: false, maxAge: null }
+// 因為http stateless機制無法保存上次的request 只要重刷就會叫你登入
+// so
+// 我們需要把它存起來
+// /secret :session ID 放入cookie
+// name: 存放在cookie的key，如果不寫的話預設是connect.sid
+// saveUninitialized:設定
+// true:會把「還沒修改過的」session就存進session store 
+// false :可避免存入太多空的 session
+//resave: 每一次與使用者互動，是否強制保存 session 並更新到 session store 裡，預設是 true
+// store：session在server 端的存放方式,預設 MemoryStore
+// session 一般可以放在 (1.記憶體)(2.cookie本身)(3.緩存)(4.資料庫)
 // 這邊存在資料庫 
 app.use(session({
   saveUninitialized:true,
@@ -39,11 +62,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/", (req, res) => { 
+app.get("/login", (req, res) => { 
   res.render("login");
 });
 
-app.post("/vvv/login",async (req,res)=>{
+app.post("/login",async (req,res)=>{
   let {account,password}=req.body || {};
   const output={
     success:false,
@@ -96,10 +119,10 @@ app.get("/m", async(req,res)=>{
 /* ************** 其他的路, 放在這行之前 *********** */
 // 靜態內容的資料夾 
 // 後端圖片資料夾
-// app.get("/",(req,res)=>{
-//   return res.render("paypal") 
+app.get("/",(req,res)=>{
+  return res.render("paypal") 
 
-// })
+})
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 let index = require('./routes')
 app.use('/backRoute', index) 

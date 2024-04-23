@@ -7,12 +7,12 @@
           <h5 class="card-title">登入</h5>
           <form name="form1" onsubmit="sendData(event)">
             <div class="mb-3">
-              <label for="account" class="form-label">Email address</label>
+              <label for="custom_id" class="form-label">Email address</label>
               <input
                 type="text"
                 class="form-control"
-                id="account"
-                name="account"
+                id="custom_id"
+                name="custom_id"
               />
             </div>
             <div class="mb-3">
@@ -67,7 +67,7 @@
 
     // 第 3 種, application/x-www-form-urlencoded
     const usp = new URLSearchParams(fd);
-    const r = await fetch("/login", {
+    const r = await fetch("/backRoute/api/login", {
       method: "POST",
       body: usp.toString(),
       headers: {
@@ -78,12 +78,16 @@
     console.log({ data });
     if(data.success){
       // 抓到前端的url query
-      const usp=new URLSearchParams(location.search);
-      if(usp.get("u")){
-        location.href=usp.get("u")//前端跳轉  
-      }else{
-        location.href="/"
-      }
+      // const usp=new URLSearchParams(location.search);
+      // if(usp.get("u")){
+      //   location.href=usp.get("u")//前端跳轉  
+      // }else{
+      //   location.href="/"
+      // }
+     
+        sessionStorage.setItem("accessToken",JSON.stringify(data.accessToken));
+        sessionStorage.setItem("refreshToken",JSON.stringify(data.refreshToken));
+        location.href="paypal"
     
     }else{
       alert(data.error || "帳號密碼輸入錯誤222")

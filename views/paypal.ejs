@@ -11,7 +11,40 @@
     <script src="https://js.braintreegateway.com/web/dropin/1.42.0/js/dropin.js"></script>
     <div id="dropin-container"></div>
     <button id="submit-button" class="button button--small button--green">Purchase</button>
+    <button id="sumb" onclick="sumb">測試jwt</button>
     <script>
+
+     
+        document.querySelector("#sumb").addEventListener("click", async () => {
+            e.preventDefault(); // 不要以傳統的方式送出表單
+            // 取得token
+            const token = sessionStorage.getItem("accessToken")
+            if (!token) {
+                return;
+            } else {  
+                const fd = new FormData(document.form1);
+                const usp = new URLSearchParams(fd);
+                const r = await fetch("/backRoute/api/login", {
+                    method: "POST",
+                    body: usp.toString(),
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        'Authorization': `Bearer ${token}`  // 将令牌加入到请求头中，使用 Bearer 方案
+                    },
+                });
+                const data = await r.json();
+                if(data.success){
+                    console.log(data.data)
+                }
+            
+                
+            }
+        });
+        // 
+        // 
+        // 
+        // 
+        //    paypal正文
         var button = document.querySelector('#submit-button');
         async function fetchData(url) {
             try {
@@ -27,7 +60,7 @@
             }
         }
 
-       async function fetchData2(url,data) {
+        async function fetchData2(url, data) {
             try {
                 const response = await fetch(url, {
                     method: 'POST', // 指定為 POST 請求
@@ -64,9 +97,9 @@
                             if (err) {
                                 console.log("ERR :" + err)
                             }
-                            console.log(payload) 
+                            console.log(payload)
                             let url = 'http://127.0.0.1:3006/backRoute/paypalPayMoney';
-                           await fetchData2(url,payload)
+                            await fetchData2(url, payload)
 
                             // Submit payload.nonce to your server
                         });
